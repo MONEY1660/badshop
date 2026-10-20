@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% load badshop_tags %}
+
+{% block title %}{{ product.brand.name }} {{ product.name }} - BadShop{% endblock %}
+
+{% block content %}
+<div class="bg-slate-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Breadcrumbs Navigation -->
+        <nav class="flex items-center gap-2 text-xs text-slate-500 font-medium mb-6">
+            <a href="{% url 'catalog:product_list' %}" class="hover:text-emerald-600">หน้าแรก</a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+            <a href="{% url 'catalog:product_list' %}" class="hover:text-emerald-600">ไม้แบดมินตันทั้งหมด</a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+            <a href="{% url 'catalog:product_list' %}?brand={{ product.brand.slug }}" class="hover:text-emerald-600">{{ product.brand.name }}</a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+            <span class="text-slate-800 font-semibold truncate">{{ product.name }}</span>
+        </nav>
+
+        <!-- Product Main Showcase (FR-16, FR-17, FR-18, FR-19, FR-20) -->
+        <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-100 shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
+            
+            <!-- Column 1: Image Showcase (FR-17) -->
+            <div class="space-y-4">
+                <div class="relative aspect-square rounded-3xl bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 p-8 flex items-center justify-center overflow-hidden border border-slate-100 shadow-inner">
+                    
+                    <!-- Top Badges -->
+                    <div class="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
+                        {% if product.is_new %}
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white shadow-sm">
+                                <i class="fa-solid fa-sparkles mr-1 text-[10px]"></i> สินค้าใหม่
+                            </span>
+                        {% endif %}
+                        {% if product.is_bestseller %}
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-sm">
+                                <i class="fa-solid fa-fire mr-1 text-[10px]"></i> ขายดี
+                            </span>
+                        {% endif %}
+                        {% if product.is_sale and product.discount_percent > 0 %}
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-600 text-white shadow-sm">
+                                ประหยัด {{ product.discount_percent }}%
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-contain hover:scale-105 transition-transform duration-300">
+                    {% else %}
+                        <!-- Visual Badminton Racket Illustration -->
+                        <div class="relative w-64 h-64 flex items-center justify-center">
+                            <svg viewBox="0 0 200 200" class="w-full h-full text-slate-300 drop-shadow-xl">
+                                <ellipse cx="100" cy="70" rx="42" ry="52" fill="none" stroke="currentColor" stroke-width="6" 
+                                         class="{% if product.brand.name == 'Yonex' %}text-sky-500{% elif product.brand.name == 'Victor' %}text-indigo-500{% elif product.brand.name == 'Li-Ning' %}text-rose-500{% elif product.brand.name == 'Mizuno' %}text-emerald-500{% else %}text-amber-500{% endif %}"></ellipse>
+                                <line x1="80" y1="25" x2="80" y2="115" stroke="currentColor" stroke-width="1.5" opacity="0.4"></line>
+                                <line x1="100" y1="20" x2="100" y2="120" stroke="currentColor" stroke-width="1.5" opacity="0.4"></line>
+                                <line x1="120" y1="25" x2="120" y2="115" stroke="currentColor" stroke-width="1.5" opacity="0.4"></line>
+                                <line x1="65" y1="50" x2="135" y2="50" stroke="currentColor" stroke-width="1.5" opacity="0.4"></line>
+                                <line x1="60" y1="70" x2="140" y2="70" stroke="currentColor" stroke-width="1.5" opacity="0.4"></line>
+                                <line x1="65" y1="90" x2="135" y2="90" stroke="currentColor" stroke-width="1.5" opacity="0.4"></line>
+                                <polygon points="94,122 106,122 103,132 97,132" fill="currentColor" class="text-slate-700"></polygon>
+                                <line x1="100" y1="130" x2="100" y2="165" stroke="currentColor" stroke-width="5" class="text-slate-700"></line>
+                                <rect x="94" y="165" width="12" height="30" rx="3" fill="currentColor" class="text-slate-800"></rect>
+                            </svg>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Trust Badges -->
+                <div class="grid grid-cols-3 gap-3 pt-2 text-center text-xs text-slate-600">
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                        <i class="fa-solid fa-certificate text-emerald-600 text-lg mb-1 block"></i>
+                        <span class="font-semibold block text-slate-800">ของแท้ 100%</span>
+                        <span class="text-[10px] text-slate-400">ประกันศูนย์ไทย</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                        <i class="fa-solid fa-truck-fast text-emerald-600 text-lg mb-1 block"></i>
+                        <span class="font-semibold block text-slate-800">ส่งฟรีทั่วไทย</span>
+                        <span class="text-[10px] text-slate-400">ยอดครบ ฿1,500</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                        <i class="fa-solid fa-box-check text-emerald-600 text-lg mb-1 block"></i>
+                        <span class="font-semibold block text-slate-800">แพ็กแน่นหนา</span>
+                        <span class="text-[10px] text-slate-400">กล่องกันกระแทก</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 2: Product Info & Order Controls (FR-16, FR-18, FR-19, FR-20) -->
+            <div class="flex flex-col justify-between space-y-6" x-data="{ qty: 1, maxStock: {{ product.stock }} }">
+                
+                <div>
+                    <!-- Brand & Category -->
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100">
+                            {{ product.brand.name }}
+                        </span>
+                        <span class="text-xs text-slate-400 font-medium">
+                            หมวดหมู่: {{ product.category.name }}
+                        </span>
+                    </div>
+
+                    <!-- Model Name (H1) -->
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight mb-3">
+                        {{ product.name }}
+                    </h1>
+
+                    <!-- Pricing (FR-16) -->
+                    <div class="flex items-baseline gap-3 my-4">
+                        <span class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                            {{ product.price|th_currency }}
+                        </span>
+                        {% if product.original_price and product.original_price > product.price %}
+                            <span class="text-base text-slate-400 line-through">
+                                {{ product.original_price|th_currency }}
+                            </span>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700">
+                                ลดไป {{ product.discount_percent }}%
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Stock Status Banner (FR-18, FR-20) -->
+                    <div class="my-4">
+                        {% if product.stock <= 0 %}
+                            <!-- Out of Stock Alert (FR-20) -->
+                            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-3">
+                                <i class="fa-solid fa-circle-xmark text-xl text-rose-600"></i>
+                                <div>
+                                    <strong class="block text-sm font-bold">สินค้าหมดชั่วคราว (Out of Stock)</strong>
+                                    <span class="text-xs text-rose-600">สินค้ารายการนี้จำหน่ายหมดแล้ว ขออภัยในความไม่สะดวก</span>
+                                </div>
+                            </div>
+                        {% elif product.is_low_stock %}
+                            <!-- Low Stock Warning (FR-18) -->
+                            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center gap-3">
+                                <i class="fa-solid fa-triangle-exclamation text-xl text-amber-600"></i>
+                                <div>
+                                    <strong class="block text-sm font-bold">สินค้าใกล้หมดแล้ว!</strong>
+                                    <span class="text-xs text-amber-700">มีสินค้าคงเหลือพร้อมจัดส่งเพียง <strong>{{ product.stock }}</strong> ชิ้นเท่านั้น</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- In Stock Available (FR-18) -->
+                            <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3">
+                                <i class="fa-solid fa-circle-check text-xl text-emerald-600"></i>
+                                <div>
+                                    <strong class="block text-sm font-bold">มีสินค้าพร้อมจำหน่าย</strong>
+                                    <span class="text-xs text-emerald-700">คงเหลือในสต็อก {{ product.stock }} ชิ้น (พร้อมจัดส่งทันที)</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Performance Ratings (FR-16) -->
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 my-6 space-y-3">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            <i class="fa-solid fa-chart-simple text-emerald-600 mr-1.5"></i> คุณสมบัติและระดับประสิทธิภาพ (Performance Rating)
+                        </h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div>
+                                <div class="flex justify-between text-slate-600 mb-1">
+                                    <span class="font-medium flex items-center gap-1.5">
+                                        <i class="fa-solid fa-bolt text-rose-500"></i> พลังตบและแรงส่งลูก (Power)
+                                    </span>
+                                    <span class="font-bold text-slate-800">{{ product.power_rating }}/10</span>
+                                </div>
+                                <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-rose-500 h-full rounded-full transition-all" style="width: {{ product.power_rating }}0%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-slate-600 mb-1">
+                                    <span class="font-medium flex items-center gap-1.5">
+                                        <i class="fa-solid fa-wind text-sky-500"></i> ความเร็วในการสวิงหน้าไม้ (Speed)
+                                    </span>
+                                    <span class="font-bold text-slate-800">{{ product.speed_rating }}/10</span>
+                                </div>
+                                <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-sky-500 h-full rounded-full transition-all" style="width: {{ product.speed_rating }}0%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-slate-600 mb-1">
+                                    <span class="font-medium flex items-center gap-1.5">
+                                        <i class="fa-solid fa-crosshairs text-emerald-500"></i> ความแม่นยำในการควบคุม (Control)
+                                    </span>
+                                    <span class="font-bold text-slate-800">{{ product.control_rating }}/10</span>
+                                </div>
+                                <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-emerald-500 h-full rounded-full transition-all" style="width: {{ product.control_rating }}0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technical Specifications Table (FR-16) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 my-4 text-xs">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 block mb-0.5">ความยืดหยุ่นก้าน</span>
+                            <span class="font-bold text-slate-800">{{ product.shaft_flexibility|default:"มาตรฐาน" }}</span>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 block mb-0.5">น้ำหนัก / ด้ามจับ</span>
+                            <span class="font-bold text-slate-800">{{ product.weight_grip|default:"4U G5" }}</span>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 block mb-0.5">จุดสมดุล (Balance)</span>
+                            <span class="font-bold text-slate-800">{{ product.balance_point|default:"สมดุล" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add to Cart & Quantity Selector (FR-19, FR-20) -->
+                <div class="pt-6 border-t border-slate-100 space-y-4">
+                    
+                    {% if product.stock > 0 %}
+                        <!-- Quantity Selector Form (FR-19, FR-28) -->
+                        <form method="post" action="{% url 'cart:cart_add' %}" class="space-y-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+
+                            <div class="flex items-center gap-4">
+                                <label class="text-sm font-bold text-slate-700">จำนวน:</label>
+                                <div class="flex items-center border border-slate-200 rounded-2xl bg-slate-50 overflow-hidden shadow-inner">
+                                    <button type="button" @click="if (qty > 1) qty--" 
+                                            class="w-10 h-10 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors">
+                                        <i class="fa-solid fa-minus text-xs"></i>
+                                    </button>
+                                    <input type="number" name="quantity" x-model.number="qty" min="1" :max="maxStock"
+                                           class="w-14 h-10 text-center font-bold text-slate-900 bg-transparent border-0 focus:ring-0 text-sm">
+                                    <button type="button" @click="if (qty < maxStock) qty++" 
+                                            class="w-10 h-10 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors">
+                                        <i class="fa-solid fa-plus text-xs"></i>
+                                    </button>
+                                </div>
+                                <span class="text-xs text-slate-400">
+                                    (สั่งได้สูงสุด {{ product.stock }} ชิ้น)
+                                </span>
+                            </div>
+
+                            <!-- Warning when selected qty exceeds stock (FR-20) -->
+                            <div x-show="qty > maxStock" x-cloak class="p-3 rounded-xl bg-rose-50 text-rose-700 text-xs font-semibold">
+                                <i class="fa-solid fa-circle-exclamation mr-1"></i> จำนวนที่เลือกเกินสินค้าคงเหลือในระบบ
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <button type="submit" 
+                                        :disabled="qty <= 0 || qty > maxStock"
+                                        class="flex-1 py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-base shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-cart-plus text-lg"></i> เพิ่มลงตะกร้าสินค้า
+                                </button>
+                                <a href="{% url 'catalog:product_list' %}" 
+                                   class="py-3.5 px-6 rounded-2xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm text-center transition-colors">
+                                    ดูรุ่นอื่นต่อ
+                                </a>
+                            </div>
+                        </form>
+                    {% else %}
+                        <!-- Out of Stock Button Disabled (FR-20) -->
+                        <div class="space-y-3">
+                            <button type="button" disabled 
+                                    class="w-full py-4 px-6 rounded-2xl bg-slate-200 text-slate-400 font-bold text-base cursor-not-allowed flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-ban"></i> สินค้าหมดชั่วคราว (ไม่สามารถสั่งซื้อได้)
+                            </button>
+                            <p class="text-xs text-slate-400 text-center">
+                                คุณสามารถดูไม้แบดมินตันรุ่นใกล้เคียงได้จากด้านล่าง
+                            </p>
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Product Detailed Description Section (FR-16) -->
+        <div class="mt-8 bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900 mb-4 pb-3 border-b border-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-circle-info text-emerald-600"></i> รายละเอียดสินค้าอย่างเป็นทางการ
+            </h2>
+            <div class="prose max-w-none text-slate-600 text-sm leading-relaxed">
+                <p>{{ product.description|linebreaks }}</p>
+            </div>
+        </div>
+
+        <!-- Related Products Section (FR-21) -->
+        {% if related_products %}
+            <div class="mt-12 space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">ไม้แบดมินตันที่คุณอาจสนใจ (FR-21)</h2>
+                        <p class="text-xs text-slate-500 mt-1">รุ่นใกล้เคียงจากแบรนด์ {{ product.brand.name }} หรือหมวดหมู่เดียวกัน</p>
+                    </div>
+                    <a href="{% url 'catalog:product_list' %}?brand={{ product.brand.slug }}" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">
+                        ดูทั้งหมด <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {% for item in related_products %}
+                        {% include "catalog/partials/product_card.html" with product=item %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

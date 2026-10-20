@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% load badshop_tags %}
+
+{% block title %}ตะกร้าสินค้าของฉัน - BadShop{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-slate-50 min-h-[calc(100vh-200px)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Page Title & Expiry Notice (FR-33) -->
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </span>
+                    ตะกร้าสินค้าของฉัน (FR-28 ถึง FR-33)
+                </h1>
+                <p class="text-xs text-slate-500 mt-1">
+                    <i class="fa-solid fa-clock-rotate-left mr-1 text-slate-400"></i>
+                    รายการสินค้าในตะกร้าจะถูกบันทึกไว้อย่างปลอดภัยเป็นเวลา 7 วัน (FR-33)
+                </p>
+            </div>
+            <a href="{% url 'catalog:product_list' %}" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-arrow-left"></i> เลือกซื้อสินค้าเพิ่ม
+            </a>
+        </div>
+
+        {% if items %}
+            
+            <!-- Stock Warning Banner if any item exceeds stock (FR-32) -->
+            {% if not has_sufficient_stock %}
+                <div class="p-4 mb-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 shadow-sm space-y-1">
+                    <div class="flex items-center gap-2 font-bold text-sm text-rose-700">
+                        <i class="fa-solid fa-triangle-exclamation text-base"></i>
+                        <span>มีสินค้าบางรายการในตะกร้าไม่เพียงพอกับสต็อกคงเหลือในระบบ</span>
+                    </div>
+                    <ul class="text-xs list-disc list-inside text-rose-600 pl-4 space-y-0.5">
+                        {% for err in stock_errors %}
+                            <li>{{ err }}</li>
+                        {% endfor %}
+                    </ul>
+                    <p class="text-xs text-rose-500 pt-1">กรุณาปรับลดจำนวนสินค้าในตะกร้าก่อนดำเนินการสั่งซื้อ</p>
+                </div>
+            {% endif %}
+
+            <!-- Free Shipping Progress Bar (NFR-01) -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm mb-6">
+                <div class="flex items-center justify-between text-xs mb-2">
+                    <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-truck-fast text-emerald-600"></i>
+                        {% if remaining_for_free_shipping == 0 %}
+                            <span class="text-emerald-600 font-bold">ยอดสั่งซื้อของคุณได้รับสิทธิ์ จัดส่งฟรี! 🎉</span>
+                        {% else %}
+                            <span>ซื้อสินค้าเพิ่มอีก <strong class="text-emerald-600 font-bold">{{ remaining_for_free_shipping|th_currency }}</strong> เพื่อรับสิทธิ์จัดส่งฟรี</span>
+                        {% endif %}
+                    </span>
+                    <span class="text-slate-400 font-medium">{{ subtotal|th_currency }} / {{ free_shipping_threshold|th_currency }}</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-500" 
+                         style="width: {{ free_shipping_progress }}%;"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                
+                <!-- Left Column: Cart Items List (FR-31) -->
+                <div class="lg:col-span-2 space-y-4">
+                    
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-4">
+                        {% for item in items %}
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-4 {% if not forloop.last %}border-b border-slate-100{% endif %}">
+                                
+                                <!-- Product Image & Name -->
+                                <div class="flex items-center gap-4 flex-1">
+                                    <div class="w-20 h-20 rounded-2xl bg-slate-50 border border-slate-100 p-2 flex items-center justify-center flex-shrink-0">
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-contain">
+                                        {% else %}
+                                            <svg viewBox="0 0 200 200" class="w-12 h-12 text-slate-300">
+                                                <ellipse cx="100" cy="70" rx="42" ry="52" fill="none" stroke="currentColor" stroke-width="8" class="text-emerald-500"></ellipse>
+                                                <line x1="100" y1="122" x2="100" y2="165" stroke="currentColor" stroke-width="7" class="text-slate-700"></line>
+                                                <rect x="92" y="165" width="16" height="30" rx="3" fill="currentColor" class="text-slate-800"></rect>
+                                            </svg>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <span class="text-[11px] font-bold tracking-wider uppercase text-emerald-600 block">
+                                            {{ item.product.brand.name }}
+                                        </span>
+                                        <h3 class="font-bold text-slate-900 text-sm hover:text-emerald-600 transition-colors">
+                                            <a href="{% url 'catalog:product_detail' item.product.slug %}">
+                                                {{ item.product.name }}
+                                            </a>
+                                        </h3>
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <span class="text-slate-500">ราคา:</span>
+                                            <span class="font-bold text-slate-800">{{ item.product.price|th_currency }}</span>
+                                            {% if item.product.stock < item.quantity %}
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700">
+                                                    สต็อกเหลือ {{ item.product.stock }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quantity Controls (FR-29) -->
+                                <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+                                    
+                                    <div class="flex items-center border border-slate-200 rounded-xl bg-slate-50 overflow-hidden shadow-inner">
+                                        <!-- Decrease -->
+                                        <form method="post" action="{% url 'cart:cart_update' item.id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="decrease">
+                                            <button type="submit" class="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors">
+                                                <i class="fa-solid fa-minus text-[10px]"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Quantity -->
+                                        <span class="w-10 text-center font-bold text-slate-900 text-xs">
+                                            {{ item.quantity }}
+                                        </span>
+
+                                        <!-- Increase -->
+                                        <form method="post" action="{% url 'cart:cart_update' item.id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="increase">
+                                            <button type="submit" 
+                                                    {% if item.quantity >= item.product.stock %}disabled{% endif %}
+                                                    class="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                                                <i class="fa-solid fa-plus text-[10px]"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Subtotal (FR-30) -->
+                                    <div class="text-right min-w-[90px]">
+                                        <span class="text-xs text-slate-400 block sm:hidden">รวม:</span>
+                                        <span class="text-sm font-extrabold text-slate-900">
+                                            {{ item.subtotal|th_currency }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Remove Button (FR-29) -->
+                                    <form method="post" action="{% url 'cart:cart_remove' item.id %}" onsubmit="return confirm('ต้องการลบสินค้านี้ออกจากตะกร้าหรือไม่?')">
+                                        {% csrf_token %}
+                                        <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 transition-colors" title="ลบสินค้านี้">
+                                            <i class="fa-solid fa-trash-can text-sm"></i>
+                                        </button>
+                                    </form>
+
+                                </div>
+
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Trust info -->
+                    <div class="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100 flex items-center gap-3 text-xs text-emerald-800">
+                        <i class="fa-solid fa-shield-check text-emerald-600 text-base"></i>
+                        <span>สินค้าทุกชิ้นรับประกันของแท้ 100% บรรจุกล่องแข็งแรงพิเศษป้องกันความเสียหายระหว่างจัดส่ง</span>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Order Summary Card (FR-30, FR-35 preview) -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm sticky top-28 space-y-6">
+                        
+                        <h2 class="text-base font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-receipt text-emerald-600"></i> สรุปคำสั่งซื้อ
+                        </h2>
+
+                        <div class="space-y-3 text-xs">
+                            <div class="flex justify-between text-slate-600">
+                                <span>ยอดรวมสินค้า (Subtotal)</span>
+                                <span class="font-bold text-slate-800 text-sm">{{ subtotal|th_currency }}</span>
+                            </div>
+                            <div class="flex justify-between text-slate-600">
+                                <span>ค่าจัดส่ง (Shipping Fee)</span>
+                                {% if shipping_fee == 0 %}
+                                    <span class="font-bold text-emerald-600">ฟรี (โปรโมชั่น)</span>
+                                {% else %}
+                                    <span class="font-bold text-slate-800 text-sm">{{ shipping_fee|th_currency }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-100 flex justify-between items-baseline">
+                                <span class="text-sm font-bold text-slate-900">ยอดชำระสุทธิ</span>
+                                <span class="text-2xl font-black text-slate-900 tracking-tight text-emerald-600">
+                                    {{ total_amount|th_currency }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Checkout Button with Stock Guard (FR-32) -->
+                        <div class="space-y-2">
+                            {% if has_sufficient_stock %}
+                                <a href="{% url 'cart:validate_checkout' %}" 
+                                   class="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 text-center">
+                                    <span>ดำเนินการสั่งซื้อสินค้า</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </a>
+                            {% else %}
+                                <button type="button" disabled 
+                                        class="w-full py-3.5 px-6 rounded-2xl bg-slate-200 text-slate-400 font-bold text-sm cursor-not-allowed text-center">
+                                    สต็อกไม่พอ กรุณาปรับจำนวน
+                                </button>
+                            {% endif %}
+                            <p class="text-[11px] text-slate-400 text-center">
+                                ราคารวมภาษีมูลค่าเพิ่มแล้ว (คำนวณฝั่งเซิร์ฟเวอร์ NFR-06)
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        {% else %}
+            <!-- Empty Cart State -->
+            <div class="bg-white rounded-3xl p-12 border border-slate-100 shadow-sm text-center max-w-lg mx-auto my-12 space-y-4">
+                <div class="w-20 h-20 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto text-3xl">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+                <h2 class="text-lg font-bold text-slate-900">ยังไม่มีสินค้าในตะกร้าของคุณ</h2>
+                <p class="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
+                    เลือกดูไม้แบดมินตันรุ่นยอดนิยมจาก Yonex, Victor, Li-Ning และเพิ่มลงตะกร้าเพื่อเริ่มต้นการสั่งซื้อ
+                </p>
+                <div class="pt-2">
+                    <a href="{% url 'catalog:product_list' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-md shadow-emerald-500/20 transition-all">
+                        <i class="fa-solid fa-store"></i> ไปเลือกชมไม้แบดมินตัน
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

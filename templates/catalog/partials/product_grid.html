@@ -1,0 +1,94 @@
+{% load badshop_tags %}
+
+<div id="product-results-container" class="space-y-6">
+    
+    <!-- Results Header: Count & Sort (FR-12, FR-13) -->
+    <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 font-bold text-sm">
+                {{ total_count }}
+            </span>
+            <p class="text-sm font-medium text-slate-700">
+                พบไม้แบดมินตันทั้งหมด <strong class="text-slate-900">{{ total_count }}</strong> รายการ
+                {% if query %}
+                    สำหรับการค้นหา "<span class="text-emerald-600 font-semibold">{{ query }}</span>"
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Sort Select Form (FR-12) -->
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <label for="sort-select" class="text-xs text-slate-500 font-semibold whitespace-nowrap">เรียงลำดับ:</label>
+            <select id="sort-select" name="sort" onchange="document.getElementById('filter-form').dispatchEvent(new Event('submit'))"
+                    class="w-full sm:w-48 text-xs font-medium rounded-xl border-slate-200 bg-slate-50 text-slate-700 py-2 px-3 focus:border-emerald-500 focus:ring-emerald-500">
+                <option value="default" {% if sort_by == 'default' %}selected{% endif %}>แนะนำ / ล่าสุด</option>
+                <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>ราคา: ต่ำไปสูง (฿)</option>
+                <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>ราคา: สูงไปต่ำ (฿)</option>
+                <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>สินค้ายอดนิยม / ขายดี</option>
+                <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>สินค้ามาใหม่ล่าสุด</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Product Grid or Empty State (FR-01, FR-15) -->
+    {% if products %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+            {% for product in products %}
+                {% include "catalog/partials/product_card.html" with product=product %}
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if products.has_other_pages %}
+            <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex items-center justify-between mt-8">
+                <div class="text-xs text-slate-500 font-medium">
+                    หน้า {{ products.number }} จากทั้งหมด {{ products.paginator.num_pages }} หน้า
+                </div>
+                <div class="flex items-center gap-1.5">
+                    {% if products.has_previous %}
+                        <a href="?page={{ products.previous_page_number }}{% for b in selected_brands %}&brand={{ b }}{% endfor %}{% for c in selected_categories %}&category={{ c }}{% endfor %}{% if query %}&q={{ query }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if stock_status %}&stock={{ stock_status }}{% endif %}{% if min_power %}&min_power={{ min_power }}{% endif %}{% if min_speed %}&min_speed={{ min_speed }}{% endif %}{% if min_control %}&min_control={{ min_control }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}"
+                           class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> ย้อนกลับ
+                        </a>
+                    {% endif %}
+
+                    {% for i in products.paginator.page_range %}
+                        {% if products.number == i %}
+                            <span class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow-sm">
+                                {{ i }}
+                            </span>
+                        {% elif i > products.number|add:"-3" and i < products.number|add:"3" %}
+                            <a href="?page={{ i }}{% for b in selected_brands %}&brand={{ b }}{% endfor %}{% for c in selected_categories %}&category={{ c }}{% endfor %}{% if query %}&q={{ query }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if stock_status %}&stock={{ stock_status }}{% endif %}{% if min_power %}&min_power={{ min_power }}{% endif %}{% if min_speed %}&min_speed={{ min_speed }}{% endif %}{% if min_control %}&min_control={{ min_control }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}"
+                               class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                                {{ i }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                        <a href="?page={{ products.next_page_number }}{% for b in selected_brands %}&brand={{ b }}{% endfor %}{% for c in selected_categories %}&category={{ c }}{% endfor %}{% if query %}&q={{ query }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if stock_status %}&stock={{ stock_status }}{% endif %}{% if min_power %}&min_power={{ min_power }}{% endif %}{% if min_speed %}&min_speed={{ min_speed }}{% endif %}{% if min_control %}&min_control={{ min_control }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}"
+                           class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
+                            ถัดไป <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+    {% else %}
+        <!-- Empty State (FR-15) -->
+        <div class="bg-white rounded-3xl p-12 border border-slate-100 shadow-sm text-center max-w-lg mx-auto my-12">
+            <div class="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4 text-rose-500 text-3xl">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">ไม่พบไม้แบดมินตันที่ตรงกับเงื่อนไข</h3>
+            <p class="text-sm text-slate-500 mb-6 leading-relaxed">
+                ขออภัย ไม่พบรายการสินค้าตามเงื่อนไขตัวกรองที่คุณระบุ ลองปรับช่วงราคา ลบตัวกรองบางข้อ หรือค้นหาด้วยชื่อรุ่นอื่น
+            </p>
+            <a href="{% url 'catalog:product_list' %}" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-md shadow-emerald-500/20 transition-all">
+                <i class="fa-solid fa-rotate-left"></i> ล้างตัวกรองทั้งหมด (FR-14)
+            </a>
+        </div>
+    {% endif %}
+
+</div>

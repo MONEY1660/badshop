@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}สมัครสมาชิก - BadShop{% endblock %}
+
+{% block content %}
+<div class="py-12 bg-slate-50 min-h-[calc(100vh-200px)] flex items-center justify-center">
+    <div class="max-w-2xl w-full mx-auto px-4 sm:px-6">
+        
+        <div class="bg-white rounded-3xl p-8 sm:p-10 border border-slate-100 shadow-xl">
+            
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl shadow-sm">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">สมัครสมาชิกใหม่ (FR-22)</h1>
+                <p class="text-sm text-slate-500 mt-1">
+                    สร้างบัญชีเพื่อสะสมแต้ม สั่งซื้อสินค้า และติดตามสถานะพัสดุได้สะดวกรวดเร็ว
+                </p>
+            </div>
+
+            <!-- Registration Form -->
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+                        {% for error in form.non_field_errors %}
+                            <p><i class="fa-solid fa-circle-exclamation mr-1"></i> {{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Section 1: Personal Info -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider pb-2 border-b border-slate-100">
+                        1. ข้อมูลส่วนตัวและเข้าสู่ระบบ
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.first_name.label }} <span class="text-rose-500">*</span></label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <p class="text-xs text-rose-600 mt-1">{{ form.first_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.last_name.label }} <span class="text-rose-500">*</span></label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <p class="text-xs text-rose-600 mt-1">{{ form.last_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.email.label }} <span class="text-rose-500">*</span></label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <p class="text-xs text-rose-600 mt-1">{{ form.email.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.phone_number.label }} <span class="text-rose-500">*</span></label>
+                            {{ form.phone_number }}
+                            {% if form.phone_number.errors %}
+                                <p class="text-xs text-rose-600 mt-1">{{ form.phone_number.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.password.label }} <span class="text-rose-500">*</span></label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <p class="text-xs text-rose-600 mt-1">{{ form.password.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.confirm_password.label }} <span class="text-rose-500">*</span></label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}
+                                <p class="text-xs text-rose-600 mt-1">{{ form.confirm_password.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Address Info -->
+                <div class="space-y-4 pt-4 border-t border-slate-100">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider pb-2 border-b border-slate-100">
+                        2. ที่อยู่จัดส่งสินค้าเริ่มต้น
+                    </h3>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.address_line.label }} <span class="text-rose-500">*</span></label>
+                        {{ form.address_line }}
+                        {% if form.address_line.errors %}
+                            <p class="text-xs text-rose-600 mt-1">{{ form.address_line.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.subdistrict.label }} <span class="text-rose-500">*</span></label>
+                            {{ form.subdistrict }}
+                            {% if form.subdistrict.errors %}
+                                <p class="text-xs text-rose-600 mt-1">{{ form.subdistrict.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.district.label }} <span class="text-rose-500">*</span></label>
+                            {{ form.district }}
+                            {% if form.district.errors %}
+                                <p class="text-xs text-rose-600 mt-1">{{ form.district.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.province.label }} <span class="text-rose-500">*</span></label>
+                            {{ form.province }}
+                            {% if form.province.errors %}
+                                <p class="text-xs text-rose-600 mt-1">{{ form.province.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.postal_code.label }} <span class="text-rose-500">*</span></label>
+                            {{ form.postal_code }}
+                            {% if form.postal_code.errors %}
+                                <p class="text-xs text-rose-600 mt-1">{{ form.postal_code.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" 
+                            class="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base shadow-lg shadow-emerald-500/25 transition-all">
+                        ลงทะเบียนสมาชิก
+                    </button>
+                </div>
+
+                <!-- Login link -->
+                <p class="text-center text-sm text-slate-500 mt-4">
+                    มีบัญชีผู้ใช้อยู่แล้ว? 
+                    <a href="{% url 'accounts:login' %}" class="text-emerald-600 font-bold hover:underline">
+                        เข้าสู่ระบบที่นี่
+                    </a>
+                </p>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

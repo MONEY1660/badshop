@@ -1,0 +1,141 @@
+{% load badshop_tags %}
+
+<div class="group relative bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300 flex flex-col h-full overflow-hidden">
+    
+    <!-- Badges Container -->
+    <div class="absolute top-3.5 left-3.5 right-3.5 flex items-start justify-between z-10 pointer-events-none">
+        <!-- Marketing Badges -->
+        <div class="flex flex-col gap-1.5 items-start">
+            {% if product.is_new %}
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-600 text-white shadow-sm">
+                    <i class="fa-solid fa-sparkles mr-1 text-[10px]"></i> สินค้าใหม่
+                </span>
+            {% endif %}
+            {% if product.is_bestseller %}
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500 text-white shadow-sm">
+                    <i class="fa-solid fa-fire mr-1 text-[10px]"></i> ขายดี
+                </span>
+            {% endif %}
+            {% if product.is_sale and product.discount_percent > 0 %}
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-600 text-white shadow-sm">
+                    -{{ product.discount_percent }}%
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- Stock Status Badge (FR-05) -->
+        <div>
+            {% if product.stock <= 0 %}
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-900/80 backdrop-blur-sm text-rose-300 border border-rose-500/30">
+                    <i class="fa-solid fa-circle-xmark mr-1 text-rose-400"></i> สินค้าหมด
+                </span>
+            {% elif product.is_low_stock %}
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                    <i class="fa-solid fa-triangle-exclamation mr-1 text-amber-500"></i> เหลือ {{ product.stock }} ชิ้น
+                </span>
+            {% else %}
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <i class="fa-solid fa-circle-check mr-1 text-emerald-500"></i> พร้อมส่ง
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Product Image / Racket Illustration -->
+    <a href="{% url 'catalog:product_detail' product.slug %}" class="block relative aspect-square bg-gradient-to-b from-slate-50 to-slate-100 p-6 flex items-center justify-center overflow-hidden">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" loading="lazy">
+        {% else %}
+            <!-- Stylized Badminton Racket Vector Canvas -->
+            <div class="relative w-40 h-40 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <svg viewBox="0 0 200 200" class="w-full h-full text-slate-300 drop-shadow-md">
+                    <!-- Racket Head -->
+                    <ellipse cx="100" cy="70" rx="42" ry="52" fill="none" stroke="currentColor" stroke-width="5" class="{% if product.brand.name == 'Yonex' %}text-sky-500{% elif product.brand.name == 'Victor' %}text-indigo-500{% elif product.brand.name == 'Li-Ning' %}text-rose-500{% elif product.brand.name == 'Mizuno' %}text-emerald-500{% else %}text-amber-500{% endif %}"></ellipse>
+                    <!-- String Pattern -->
+                    <line x1="80" y1="25" x2="80" y2="115" stroke="currentColor" stroke-width="1.2" opacity="0.4"></line>
+                    <line x1="100" y1="20" x2="100" y2="120" stroke="currentColor" stroke-width="1.2" opacity="0.4"></line>
+                    <line x1="120" y1="25" x2="120" y2="115" stroke="currentColor" stroke-width="1.2" opacity="0.4"></line>
+                    <line x1="65" y1="50" x2="135" y2="50" stroke="currentColor" stroke-width="1.2" opacity="0.4"></line>
+                    <line x1="60" y1="70" x2="140" y2="70" stroke="currentColor" stroke-width="1.2" opacity="0.4"></line>
+                    <line x1="65" y1="90" x2="135" y2="90" stroke="currentColor" stroke-width="1.2" opacity="0.4"></line>
+                    <!-- T-Joint -->
+                    <polygon points="94,122 106,122 103,132 97,132" fill="currentColor" class="text-slate-700"></polygon>
+                    <!-- Shaft -->
+                    <line x1="100" y1="130" x2="100" y2="165" stroke="currentColor" stroke-width="4.5" class="text-slate-600"></line>
+                    <!-- Grip / Handle -->
+                    <rect x="94" y="165" width="12" height="30" rx="3" fill="currentColor" class="text-slate-800"></rect>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 rounded-2xl">
+                    <span class="px-3 py-1.5 rounded-xl bg-white/95 text-xs font-bold text-slate-800 shadow-md">
+                        ดูรายละเอียด
+                    </span>
+                </div>
+            </div>
+        {% endif %}
+    </a>
+
+    <!-- Product Info Details -->
+    <div class="p-5 flex flex-col flex-grow">
+        
+        <!-- Brand & Category -->
+        <div class="flex items-center justify-between text-xs text-slate-400 font-semibold mb-1">
+            <span class="text-emerald-600 font-bold tracking-wider uppercase">{{ product.brand.name }}</span>
+            <span class="truncate max-w-[140px]">{{ product.category.name }}</span>
+        </div>
+
+        <!-- Model Name (FR-02) -->
+        <h3 class="font-bold text-slate-900 text-base leading-snug line-clamp-1 mb-2 group-hover:text-emerald-600 transition-colors">
+            <a href="{% url 'catalog:product_detail' product.slug %}">
+                {{ product.name }}
+            </a>
+        </h3>
+
+        <!-- Mini Ratings Meters (Power, Speed, Control - FR-11) -->
+        <div class="grid grid-cols-3 gap-1.5 my-2.5 py-2 px-2.5 bg-slate-50 rounded-xl text-[11px]">
+            <div>
+                <div class="flex justify-between text-slate-500 mb-0.5">
+                    <span>ตบ (P)</span>
+                    <span class="font-bold text-slate-700">{{ product.power_rating }}/10</span>
+                </div>
+                <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-rose-500 h-full rounded-full" style="width: {{ product.power_rating }}0%;"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between text-slate-500 mb-0.5">
+                    <span>เร็ว (S)</span>
+                    <span class="font-bold text-slate-700">{{ product.speed_rating }}/10</span>
+                </div>
+                <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-sky-500 h-full rounded-full" style="width: {{ product.speed_rating }}0%;"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between text-slate-500 mb-0.5">
+                    <span>คุม (C)</span>
+                    <span class="font-bold text-slate-700">{{ product.control_rating }}/10</span>
+                </div>
+                <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-emerald-500 h-full rounded-full" style="width: {{ product.control_rating }}0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Section (FR-02) -->
+        <div class="mt-auto pt-3 border-t border-slate-100 flex items-baseline justify-between">
+            <div>
+                <span class="text-xl font-extrabold text-slate-900 tracking-tight">{{ product.price|th_currency }}</span>
+                {% if product.original_price and product.original_price > product.price %}
+                    <span class="text-xs text-slate-400 line-through ml-1.5">{{ product.original_price|th_currency }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Action Link -->
+            <a href="{% url 'catalog:product_detail' product.slug %}" 
+               class="inline-flex items-center justify-center p-2 rounded-xl text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white transition-all text-xs font-semibold"
+               title="ดูรายละเอียดสินค้า">
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</div>

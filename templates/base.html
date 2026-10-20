@@ -1,0 +1,324 @@
+{% load static %}
+{% load badshop_tags %}
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BadShop - ร้านจำหน่ายไม้แบดมินตันออนไลน์ยอดนิยม{% endblock %}</title>
+    
+    <!-- Google Fonts: Prompt & Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'Sarabun', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Alpine.js & HTMX for sleek micro-interactions -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Prompt', 'Sarabun', sans-serif;
+        }
+        [x-cloak] { display: none !important; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen text-slate-800 antialiased selection:bg-emerald-500 selection:text-white" x-data="{ mobileMenuOpen: false }">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-900 text-white text-xs py-2 px-4 text-center font-medium shadow-inner">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <span class="hidden sm:inline">🏸 ยินดีต้อนรับสู่ BadShop ศูนย์รวมไม้แบดมินตันแท้ 100% ประกันศูนย์</span>
+            <span class="mx-auto sm:mx-0">🔥 จัดส่งฟรีทั่วประเทศ เมื่อสั่งซื้อครบ ฿1,500 ขึ้นไป</span>
+            <div class="hidden md:flex items-center space-x-3 text-emerald-100">
+                <span><i class="fa-solid fa-phone mr-1"></i> 02-999-8888</span>
+                <span>|</span>
+                <span><i class="fa-brands fa-line mr-1"></i> @badshop</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Brand Logo -->
+                <div class="flex items-center">
+                    <a href="{% url 'catalog:product_list' %}" class="flex items-center gap-3 group">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-feather-pointed text-2xl rotate-45"></i>
+                        </div>
+                        <div>
+                            <span class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-600 via-teal-700 to-slate-900 bg-clip-text text-transparent">BADSHOP</span>
+                            <span class="block text-[10px] text-slate-500 font-semibold tracking-wider uppercase -mt-1">Badminton Specialist</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Navigation Links (Desktop) -->
+                <nav class="hidden md:flex items-center space-x-8 text-sm font-medium">
+                    <a href="{% url 'catalog:product_list' %}" class="text-slate-700 hover:text-emerald-600 transition-colors flex items-center gap-1.5 py-2 border-b-2 border-transparent hover:border-emerald-500">
+                        <i class="fa-solid fa-store text-slate-400"></i> ไม้แบดมินตันทั้งหมด
+                    </a>
+                    <a href="{% url 'catalog:product_list' %}?category=power" class="text-slate-600 hover:text-emerald-600 transition-colors">
+                        ไม้สายบุก (Power)
+                    </a>
+                    <a href="{% url 'catalog:product_list' %}?category=speed" class="text-slate-600 hover:text-emerald-600 transition-colors">
+                        ไม้สายสปีด (Speed)
+                    </a>
+                    <a href="{% url 'catalog:product_list' %}?category=all-around" class="text-slate-600 hover:text-emerald-600 transition-colors">
+                        ไม้สายคอนโทรล (Control)
+                    </a>
+                </nav>
+
+                <!-- User & Cart Actions -->
+                <div class="flex items-center gap-4">
+                    
+                    <!-- Cart Button with dynamic badge -->
+                    <a href="{% url 'cart:cart_detail' %}" class="relative p-2.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-600 transition-all group" title="ตะกร้าสินค้า">
+                        <i class="fa-solid fa-cart-shopping text-lg group-hover:scale-110 transition-transform"></i>
+                        {% if cart_total_items and cart_total_items > 0 %}
+                            <span class="absolute -top-1 -right-1 bg-rose-500 text-white font-bold text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-sm animate-pulse">
+                                {{ cart_total_items }}
+                            </span>
+                        {% endif %}
+                    </a>
+
+                    <!-- User Account Dropdown -->
+                    {% if user.is_authenticated %}
+                        <div class="relative" x-data="{ userMenuOpen: false }">
+                            <button @click="userMenuOpen = !userMenuOpen" class="flex items-center gap-2 p-1.5 pr-3 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors text-sm font-medium text-slate-700">
+                                <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                                    {{ user.first_name|default:user.email|slice:":1"|upper }}
+                                </div>
+                                <span class="hidden lg:inline">{{ user.first_name|default:user.email }}</span>
+                                <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                            </button>
+
+                            <div x-show="userMenuOpen" @click.away="userMenuOpen = false" x-cloak
+                                 class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 transform origin-top-right transition-all">
+                                <div class="px-4 py-2 border-b border-slate-100">
+                                    <p class="text-xs text-slate-400">เข้าสู่ระบบด้วย</p>
+                                    <p class="text-sm font-semibold text-slate-800 truncate">{{ user.email }}</p>
+                                </div>
+                                {% if user.is_staff %}
+                                    <a href="/admin/" class="flex items-center gap-2.5 px-4 py-2 text-sm text-amber-700 hover:bg-amber-50">
+                                        <i class="fa-solid fa-shield-halved text-amber-600"></i> จัดการหลังบ้าน (Django Admin)
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'accounts:profile' %}" class="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-600">
+                                    <i class="fa-solid fa-user text-slate-400"></i> โปรไฟล์และสมุดที่อยู่
+                                </a>
+                                <a href="{% url 'orders:order_list' %}" class="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-600">
+                                    <i class="fa-solid fa-box text-slate-400"></i> ประวัติคำสั่งซื้อของฉัน
+                                </a>
+                                <div class="border-t border-slate-100 my-1"></div>
+                                <form method="post" action="/accounts/logout/">
+                                    {% csrf_token %}
+                                    <button type="submit" class="w-full text-left flex items-center gap-2.5 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50">
+                                        <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="hidden sm:flex items-center gap-2">
+                            <a href="{% url 'accounts:login' %}" class="px-4 py-2 text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors">
+                                เข้าสู่ระบบ
+                            </a>
+                            <a href="{% url 'accounts:register' %}" class="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:shadow transition-all">
+                                สมัครสมาชิก
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    <!-- Mobile Menu Hamburger -->
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-slate-600 hover:text-emerald-600 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl" x-show="!mobileMenuOpen"></i>
+                        <i class="fa-solid fa-xmark text-xl" x-show="mobileMenuOpen" x-cloak></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div x-show="mobileMenuOpen" x-cloak class="md:hidden border-t border-slate-100 bg-white px-4 pt-3 pb-6 space-y-2">
+            <a href="{% url 'catalog:product_list' %}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-800 hover:bg-emerald-50 hover:text-emerald-600">
+                <i class="fa-solid fa-store mr-2 text-slate-400"></i> ไม้แบดมินตันทั้งหมด
+            </a>
+            <a href="{% url 'catalog:product_list' %}?category=power" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-emerald-50">
+                ไม้สายบุก (Power)
+            </a>
+            <a href="{% url 'catalog:product_list' %}?category=speed" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-emerald-50">
+                ไม้สายสปีด (Speed)
+            </a>
+            <a href="{% url 'catalog:product_list' %}?category=all-around" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-emerald-50">
+                ไม้สายคอนโทรล (Control)
+            </a>
+            {% if user.is_authenticated %}
+                <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                    <a href="{% url 'accounts:profile' %}" class="px-3 py-2 text-sm font-medium text-slate-800 hover:bg-emerald-50 flex items-center gap-2">
+                        <i class="fa-solid fa-user text-emerald-600"></i> ข้อมูลบัญชี: {{ user.get_full_name }}
+                    </a>
+                    <a href="{% url 'orders:order_list' %}" class="px-3 py-2 text-sm font-medium text-slate-800 hover:bg-emerald-50 flex items-center gap-2">
+                        <i class="fa-solid fa-box text-emerald-600"></i> ประวัติคำสั่งซื้อ
+                    </a>
+                    <form method="post" action="/accounts/logout/">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full text-left px-3 py-2 text-sm font-medium text-rose-600 flex items-center gap-2">
+                            <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                    <a href="{% url 'accounts:login' %}" class="w-full text-center py-2.5 rounded-xl border border-slate-200 text-slate-700 font-medium">เข้าสู่ระบบ</a>
+                    <a href="{% url 'accounts:register' %}" class="w-full text-center py-2.5 rounded-xl bg-emerald-600 text-white font-medium">สมัครสมาชิก</a>
+                </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Global Flash Messages Notification Area -->
+    {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
+            {% for message in messages %}
+                <div class="p-4 mb-3 rounded-2xl flex items-center justify-between shadow-sm transition-all 
+                    {% if message.tags == 'success' %}bg-emerald-50 border border-emerald-200 text-emerald-800
+                    {% elif message.tags == 'error' %}bg-rose-50 border border-rose-200 text-rose-800
+                    {% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-800
+                    {% else %}bg-blue-50 border border-blue-200 text-blue-800{% endif %}"
+                    x-data="{ show: true }" x-show="show">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid 
+                            {% if message.tags == 'success' %}fa-circle-check text-emerald-600
+                            {% elif message.tags == 'error' %}fa-circle-exclamation text-rose-600
+                            {% elif message.tags == 'warning' %}fa-triangle-exclamation text-amber-600
+                            {% else %}fa-circle-info text-blue-600{% endif %} text-lg"></i>
+                        <span class="text-sm font-medium">{{ message }}</span>
+                    </div>
+                    <button @click="show = false" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content Block -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-300 border-t border-slate-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Col 1: Store Bio -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white">
+                            <i class="fa-solid fa-feather-pointed text-xl rotate-45"></i>
+                        </div>
+                        <span class="text-xl font-extrabold text-white">BADSHOP</span>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        ศูนย์รวมไม้แบดมินตันของแท้ 100% ครบทุกแบรนด์ชั้นนำระดับโลก Yonex, Victor, Li-Ning, Mizuno, Felet พร้อมบริการจัดส่งด่วนทั่วไทย
+                    </p>
+                    <div class="flex items-center gap-3 text-slate-400 text-lg">
+                        <a href="#" class="hover:text-emerald-400"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="hover:text-emerald-400"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="hover:text-emerald-400"><i class="fa-brands fa-line"></i></a>
+                        <a href="#" class="hover:text-emerald-400"><i class="fa-brands fa-tiktok"></i></a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Categories -->
+                <div>
+                    <h3 class="text-white text-sm font-semibold tracking-wider uppercase mb-4">หมวดหมู่ไม้แบดมินตัน</h3>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li><a href="{% url 'catalog:product_list' %}?category=power" class="hover:text-emerald-400">ไม้สายบุกและตบหนัก (Head Heavy)</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?category=speed" class="hover:text-emerald-400">ไม้สายสปีดและเกมเร็ว (Head Light)</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?category=all-around" class="hover:text-emerald-400">ไม้สายควบคุมและรอบด้าน (Even Balance)</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?category=beginner" class="hover:text-emerald-400">ไม้สำหรับผู้เริ่มต้นและฝึกซ้อม</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Brands -->
+                <div>
+                    <h3 class="text-white text-sm font-semibold tracking-wider uppercase mb-4">แบรนด์ยอดนิยม</h3>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li><a href="{% url 'catalog:product_list' %}?brand=yonex" class="hover:text-emerald-400">Yonex (ญี่ปุ่น)</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?brand=victor" class="hover:text-emerald-400">Victor (ไต้หวัน)</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?brand=li-ning" class="hover:text-emerald-400">Li-Ning (จีน)</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?brand=mizuno" class="hover:text-emerald-400">Mizuno (ญี่ปุ่น)</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?brand=felet" class="hover:text-emerald-400">Felet (มาเลเซีย)</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Trust & Guarantee -->
+                <div>
+                    <h3 class="text-white text-sm font-semibold tracking-wider uppercase mb-4">ความมั่นใจในการสั่งซื้อ</h3>
+                    <div class="space-y-3 text-sm text-slate-400">
+                        <div class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-shield-check text-emerald-400 text-lg mt-0.5"></i>
+                            <div>
+                                <strong class="text-white block">ของแท้ 100%</strong>
+                                <span>รับประกันสินค้าของแท้จากตัวแทนจำหน่าย</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-truck-fast text-emerald-400 text-lg mt-0.5"></i>
+                            <div>
+                                <strong class="text-white block">ส่งฟรีเมื่อสั่งครบ ฿1,500</strong>
+                                <span>แพ็กกล่องแข็งแรง กันกระแทกพิเศษ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-800 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+                <p>&copy; 2026 BadShop Thailand. All rights reserved. ระบบจำหน่ายไม้แบดมินตันออนไลน์</p>
+                <p class="mt-2 sm:mt-0">พัฒนาด้วย Django 5.x & PostgreSQL (Neon)</p>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

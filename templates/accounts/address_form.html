@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - BadShop{% endblock %}
+
+{% block content %}
+<div class="py-12 bg-slate-50 min-h-[calc(100vh-200px)] flex items-center justify-center">
+    <div class="max-w-xl w-full mx-auto px-4">
+        
+        <div class="bg-white rounded-3xl p-8 sm:p-10 border border-slate-100 shadow-xl">
+            
+            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black text-slate-900 tracking-tight">{{ title }}</h1>
+                    <p class="text-xs text-slate-400">กรอกรายละเอียดสถานที่สำหรับจัดส่งสินค้า</p>
+                </div>
+            </div>
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.recipient_name.label }} <span class="text-rose-500">*</span></label>
+                    {{ form.recipient_name }}
+                    {% if form.recipient_name.errors %}
+                        <p class="text-xs text-rose-600 mt-1">{{ form.recipient_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.phone_number.label }} <span class="text-rose-500">*</span></label>
+                    {{ form.phone_number }}
+                    {% if form.phone_number.errors %}
+                        <p class="text-xs text-rose-600 mt-1">{{ form.phone_number.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.address_line.label }} <span class="text-rose-500">*</span></label>
+                    {{ form.address_line }}
+                    {% if form.address_line.errors %}
+                        <p class="text-xs text-rose-600 mt-1">{{ form.address_line.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.subdistrict.label }} <span class="text-rose-500">*</span></label>
+                        {{ form.subdistrict }}
+                        {% if form.subdistrict.errors %}
+                            <p class="text-xs text-rose-600 mt-1">{{ form.subdistrict.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.district.label }} <span class="text-rose-500">*</span></label>
+                        {{ form.district }}
+                        {% if form.district.errors %}
+                            <p class="text-xs text-rose-600 mt-1">{{ form.district.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.province.label }} <span class="text-rose-500">*</span></label>
+                        {{ form.province }}
+                        {% if form.province.errors %}
+                            <p class="text-xs text-rose-600 mt-1">{{ form.province.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">{{ form.postal_code.label }} <span class="text-rose-500">*</span></label>
+                        {{ form.postal_code }}
+                        {% if form.postal_code.errors %}
+                            <p class="text-xs text-rose-600 mt-1">{{ form.postal_code.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-700">
+                        {{ form.is_default }}
+                        <span class="font-medium">{{ form.is_default.label }}</span>
+                    </label>
+                </div>
+
+                <div class="pt-4 flex items-center gap-3">
+                    <button type="submit" 
+                            class="flex-1 py-3 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-500/20 transition-all">
+                        บันทึกที่อยู่จัดส่ง
+                    </button>
+                    <a href="{% url 'accounts:profile' %}" 
+                       class="py-3 px-6 rounded-2xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition-colors">
+                        ยกเลิก
+                    </a>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
